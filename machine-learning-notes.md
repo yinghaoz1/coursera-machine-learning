@@ -1061,3 +1061,33 @@ We can now calculate three separate error values for the three different sets us
 3. Estimate the generalization error using the test set with $J_{test}(Θ^{(d)})$, ($d$ = theta from polynomial with lower error).
 
 This way, the degree of the polynomial $d$ has not been trained using the test set.
+
+## 10.3 Diagnosing Bias vs. Variance
+In this section we examine the relationship between the degree of the polynomial $d$ and the underfitting or overfitting of our hypothesis.
+
+- We need to distinguish whether **bias** or **variance** is the problem contributing to bad predictions.
+- High bias is underfitting and high variance is overfitting. Ideally, we need to find a golden mean between these two.
+
+The training error will tend to **decrease** as we increase the degree $d$ of the polynomial.
+
+At the same time, the cross validation error will tend to **decrease** as we increase $d$ up to a point, and then it will **increase** as $d$ is increased, forming a convex curve.
+
+**High bias (underfitting)**: both $J_{train}(\Theta)$ and $J_{CV}(\Theta)$ will be high. Also, $J_{CV}(\Theta)\approx J_{train}(\Theta)$.
+
+**High variance (overfitting)**: $J_{train}(\Theta)$ will be low and $J_{CV}(\Theta)$ will be much greater than $J_{train}(\Theta)$.
+
+The is summarized in the figure below:
+
+![10-3-1](10-3-1.png)
+
+## 10.4 Regularization and Bias/Variance
+![10-4-1](10-4-1.png)
+
+In the figure above, we see that as $\lambda$ increases, our fit becomes more rigid. On the other hand, as $\lambda$ approaches $0$, we tend to over overfit the data. So how do we choose our parameter $\lambda$ to get it 'just right'? In order to choose the model and the regularization term $\lambda$, we need to:
+
+1. Create a list of lambdas (i.e. $\lambda\in\{0,0.01,0.02,0.04,0.08,0.16,0.32,0.64,1.28,2.56,5.12,10.24\}$);
+2. Create a set of models with different degrees or any other variants.
+3. Iterate through the $\lambda$s and for each $\lambda$ go through all the models to learn some $\lambda$.
+4. Compute the cross validation error using the learned $\Theta$ (computed with $\lambda$) on the $J_{CV}(\Theta)$ **without** regularization or $\lambda=0$.
+5. Select the best combo that produces the lowest error on the cross validation set.
+6. Using the best combo $\Theta$ and $\lambda$, apply it on $J_{test}(\Theta)$ to see if it has a good generalization of the problem.
