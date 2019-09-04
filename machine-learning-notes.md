@@ -1005,3 +1005,40 @@ The following image gives us an intuition of what is happening as we are impleme
 
 Ideally, you want $h_\Theta(x^{(i)}) \approx y^{(i)}$. This will minimize our cost function. However, keep in mind that $J(\Theta)$ is not convex and thus we can end up in a local minimum instead.
 
+# 10. Advice for Applying Machine Learning
+## 10.1 Evaluating a Hypothesis
+Once we have done some trouble shooting for errors in our predictions by:
+
+- Getting more training examples
+- Trying smaller sets of features
+- Trying additional features
+- Trying polynomial features
+- Increasing or decreasing $\lambda$
+- We can move on to evaluate our new hypothesis.
+
+A hypothesis may have a low error for the training examples but still be inaccurate (because of overfitting). Thus, to evaluate a hypothesis, given a dataset of training examples, we can split up the data into two sets: a training set and a test set. Typically, the training set consists of $70\%$ of your data and the test set is the remaining $30\%$.
+
+The new procedure using these two sets is then:
+
+1. Learn $\Theta$ and minimize $J_{train}(\Theta)$ using the training set
+2. Compute the test set error $J_{test}(\Theta)$
+
+**The test set error**
+
+1. For linear regression: 
+$$J_{test}(\Theta)=\frac{1}{2m_{test}}\sum^{m_{test}}_{i=1}(h_{\Theta}(x^{(i)}_{test})−y^{(i)}_{test})^2$$
+
+2. For classification: Misclassification error (aka $0/1$ misclassification error):
+
+$$err(h_{\Theta}(x),y)=
+\begin{cases}
+1 & \quad \text{if }h_{\Theta}(x)\geq0.5\text{ and }y=0\text{ or }h_{\Theta}(x)<0.5\text{ and }y=1\\
+0 & \quad\text{otherwise}
+\end{cases}
+$$
+
+This gives us a binary $0$ or $1$ error result based on a misclassification. The average test error for the test set is:
+
+$$\text{Test Error}=\frac{1}{m_{test}}\sum^{m_{test}}_{i=1}err(h_{\Theta}(x^{(i)}_{test}),y^{(i)}_{test})$$
+
+This gives us the proportion of the test data that was misclassified.
