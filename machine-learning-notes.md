@@ -1188,3 +1188,25 @@ $$\text{Precision}=\frac{\text{True positive}}{\text{no. of predicted positive}}
 
 $$\text{Recall}=\frac{\text{True positive}}{\text{no. of actual positive}}=\frac{\text{True positve}}{\text{True postive}+\text{False negative}}$$
 
+## 11.4 Trade Off Precision and Recall
+The logistic regression has the result: $0\leq h_{\theta}(x)\leq 1$. And it will predict $1$ if $h_{\theta}(x) \geq \text{threshold}$, and predict $0$ if $h_{\theta}(x) < \text{threshold}$.
+
+- Suppose we want to predict $y=1$ (cancer) only if very confident, we will have **higher precision** and **lower recall**.
+- Suppose we want to avoid missing too many cases of cancer (avoid false negative), we will have **higher recall** and **lower precision**.
+
+So how to compare precision/recall numbers?
+
+$$\text{F}_1 \text{-score}(\text{F-score}) = 2\frac{PR}{P+R}$$
+
+- If $P=0$ or $R=0$, we will have $\text{F-score}=0$
+- If $P=1$ and $R=1$, we will have $\text{F-score}=1$
+
+## 11.5 Data for Machine Learning
+**Large data rationale**
+
+Assume feature $x\in \R^{n+1}$ has insufficient information to predict $y$ accurately. The useful test is: Given the input $x$, can a human expert confidently predict $y$?
+
+- If we use a learning algorithm with many parameters (e.g. logittic regression/linear regression with many features; neural network with many hidden units), this equals to use **low bias algorithms**, and $J_{train}(\theta)$ will be small.
+- If we use a very large training set (unlikely to overfit), it will have **low variance** and $J_{train}(\theta) \approx J_{test}(\theta)$.
+- By putting it together, $J_{test}(\theta)$ will be small.
+
