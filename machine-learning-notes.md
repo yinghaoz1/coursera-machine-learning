@@ -1168,3 +1168,23 @@ For example, assume that we have $500$ emails and our algorithm misclassifies a 
 ![11-2-1](11-2-1.png)
 
 It is very important to get error results as a single, numerical value. Otherwise it is difficult to assess your algorithm's performance. For example if we use stemming, which is the process of treating the same word with different forms (fail/failing/failed) as one word (fail), and get a $3\%$ error rate instead of $5\%$, then we should definitely add it to our model. However, if we try to distinguish between upper case and lower case letters and end up getting a $3.2\%$ error rate instead of $3\%$, then we should avoid using this new feature. Hence, we should try new things, get a numerical value for our error rate, and based on our result decide whether we want to keep the new feature or not.
+
+## 11.3 Error Metrics for Skewed Class
+**Precision/Recall**
+
+$y=1$ in presence of rare class that we want to detect
+
+
+|  |1|0|
+|--|--|--|
+|1|True positive|False postive|
+|0|False negative|True negative|
+
+**Precision**: Of all patients where we predicted $y=1$, what fraction actually has cancer?
+
+$$\text{Precision}=\frac{\text{True positive}}{\text{no. of predicted positive}}=\frac{\text{True positve}}{\text{True postive}+\text{False postive}}$$
+
+**Recall**: Of all patients that actually have cancer, what fraction did we correctly detect as having cancer?
+
+$$\text{Recall}=\frac{\text{True positive}}{\text{no. of actual positive}}=\frac{\text{True positve}}{\text{True postive}+\text{False negative}}$$
+
