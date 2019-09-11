@@ -1371,3 +1371,62 @@ $$
 Given the parameter $\theta$, we can draw the non-linear decision boundary by juding if the point $x$ is far from all of the landmarks.
 
 ## 12.5 Kernels II
+When we use the kernel method, the way we choose the landmark is that give $(x^{(1)}, y^{(1)}),(x^{(2)}, y^{(2)}),\dots,(x^{(m)},y^{(m)})$, we choose $l^{(1)}=x^{(1)},l^{(2)}=x^{(2)},\dots,l^{(m)}=x^{(m)}$. So for training example $(x^{(i)}, y^{(i)})$, we have a vector of $f^{(i)}$:
+
+$$
+f^{(i)}=
+\begin{bmatrix}
+f_0^{(i)} \\
+f_1^{(i)} \\
+f_2^{(i)} \\
+\vdots \\
+f_m^{(i)} \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 \\
+\text{similarity}(x^{(i)},l^{(1)}) \\
+\text{similarity}(x^{(i)},l^{(2)}) \\
+\vdots \\
+\text{similarity}(x^{(i)},l^{(m)}) \\
+\end{bmatrix}
+$$
+
+where $x^{(i)}\in\R^{n+1}$ (or $\R^n$) and $f^{(i)}\in\R^{m+1}$.
+
+Based on the kernel method, the hypothesis can be modified into:
+
+$$
+h_\theta(x)=
+\begin{cases}
+1 & \quad \theta^Tf\geq0\\
+0 & \quad \text{otherwise}
+\end{cases}
+$$
+
+The cost function will be modified to:
+
+$$
+\min_\theta C\sum_{i=1}^m \Big[y^{(i)}cost_1(\theta^Tf^{(i)})+(1-y^{(i)})cost_0(\theta^Tf^{(i)})\Big]+\frac12\sum_{j=1}^m\theta_j^2
+$$
+
+where $\theta\in\R^{m+1}$.
+
+Also, the $\sum_{j=1}^m\theta_j^2$ can be written to $\theta^T\theta$ where $theta$ is a vector ignoring $\theta_0$:
+
+$$
+\theta=
+\begin{bmatrix}
+\theta_1 \\
+\theta_2 \\
+\vdots \\
+\theta_m \\
+\end{bmatrix}
+$$
+
+The two parameters $C$ and $\sigma^2$ can affect the bias and variance of the model:
+
+- If we have large $C$, which corresponds to small $\lambda$, it will have **lower bias** and **higher variance**.
+- If we have small $C$, which corresponds to large $\lambda$, it will have **higher bias** and **lower variance**.
+- If we have large $\sigma^2$, which means features $f_i$ vary more smoothly, it will have **higher bias** and **lower variance**.
+- If we have small $\sigma^2$, which means features $f_i$ vary less smoothly, it will have **lower bias** and **higher variance**.
