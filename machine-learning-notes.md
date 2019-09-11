@@ -1430,3 +1430,36 @@ The two parameters $C$ and $\sigma^2$ can affect the bias and variance of the mo
 - If we have small $C$, which corresponds to large $\lambda$, it will have **higher bias** and **lower variance**.
 - If we have large $\sigma^2$, which means features $f_i$ vary more smoothly, it will have **higher bias** and **lower variance**.
 - If we have small $\sigma^2$, which means features $f_i$ vary less smoothly, it will have **lower bias** and **higher variance**.
+
+## 12.6 Using A SVM
+In industry, we can use SVM software package (e.g. `liblinear`, `libsvm`,...) to solve for parameters $\theta$. Generally, we need to specify two thing:
+
+- Choice of parameter $C$.
+- Choice of kernel (similarity function).
+
+If we choose no kernel (or linear kernel), it is same as predicting $y=1$ if $\theta^Tx\geq0$ where $x\in\R^{n+1}$. This is suitable when $n$ is large and $m$ is small. Otherwise, we may choose Gaussian kernel $f_i=\exp\Big(-\frac{\|x-l^{(i)}\|^2}{2\sigma^2}\Big)$ where $l^{(i)}=x^{(i)}$ and $x\in\R^{n}$. This situation is suitable when $n$ is small and $m$ is large and we need to choose $\sigma^2$
+
+When we use `MATLAB`, we need to specify the kernel or similarity functions like this:
+
+```matlab
+function f=kernel(x1, x2)
+   f = $\exp\Big(-\frac{\|x-l^{(i)}\|^2}{2\sigma^2}\Big)$
+return
+```
+
+Note: Do perform feature scaling before using the Gaussian kernel.
+
+Another thing that needs to mention is that not all similarity functions $\text{similarity}(x,l)$ make valid kernels. We need to satisfy technical condtion called Mercer's Theorem to make sure SVM pakages' optimizations run correctly, and do not diverge.
+
+There are many off-the-shelf kernels available:
+- Polynomial kernel: $(x^Tl+\text{constant})^{\text{degree}}$
+- More esoretic kernels: string kernel, chi-square kernel, historgram intersection kernel, ...
+
+When we deal with multi-class classification, like $y\in\{1,2,3,\cdots,K\}$many SVM packages already have built-in multi-class classfication functionality. Otherwise, we can use one-vs.-all method. That is, train $K$ SVMs, one to distinguish $y=i$ from the rest, for $i=1,2,\dots,K$, get $\theta^{(1)},\theta^{(2)},\dots,\theta^{(K)}$, and pick class $i$ with largest $(\theta^{(i)})^Tx$
+
+Sometimes based on different situations, we may need to consider whether to choose logistic regression or SVMs. Concretely, when $n=$ number of features ($x\in\R^{n+1}$) and $m=$ number of training examples:
+
+- If $n$ is large and $m$ is small, we use logistic regression or SVM without a kernel (linear kernel).
+- If $n$ is small and $m$ is intermediate, we use SVM with Gaussian kernel.
+- If $n$ is small and $m$ is large, we create and add more features, then use logistic regression or SVM without a kernel.
+- Neural network is likely to work well for most of these settings, but may be slower to train.
