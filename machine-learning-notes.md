@@ -1239,7 +1239,7 @@ And for the cost function of support vector machine, besides changing two parts 
 
 So, the cost function for the support vector machine is:
 
-$$\text{cost}=\min_\theta C\sum_{i=1}^m\Big[y^{(i)}cost_1(\theta^Tx^{(i)})+(1-y^{(i)})cost_0(\theta^Tx^{(i)})\Big]+\frac12\sum_{i=1}^n\theta_j^2$$
+$$\text{cost}=\min_\theta C\sum_{i=1}^m\Big[y^{(i)}cost_1(\theta^Tx^{(i)})+(1-y^{(i)})cost_0(\theta^Tx^{(i)})\Big]+\frac12\sum_{j=1}^n\theta_j^2$$
 
 And for this cost function, the hypothesis for support vector machine is:
 
@@ -1250,3 +1250,31 @@ h_\theta(x)=
 0 & \quad\text{otherwise}
 \end{cases}
 $$
+
+## 12.2 Large Margin Intuition
+Recall that the cost function of support vector machine is:
+
+$$\min_\theta C\sum_{i=1}^m\Big[y^{(i)}cost_1(\theta^Tx^{(i)})+(1-y^{(i)})cost_0(\theta^Tx^{(i)})\Big]+\frac12\sum_{j=1}^n\theta_j^2$$
+
+Based on this cost function, if $y=1$, we want $\theta^Tx\gg1$, not just $\gg0$. Also, if $y=0$, we want $\theta^Tx\ll-1$, not just $\ll0$.
+
+![12-2-1](12-2-1.png)
+
+Given a very large $C$, if we want to minimize the cost function, we will set the cost part nearlt to $0$. And this cost function will be modifed to:
+
+$$\min_\theta\frac{1}{2}\sum_{j=1}^n\theta_j^2$$
+
+$$
+s.t.
+\begin{cases}
+\theta^Tx^{(i)}\gg 1 & \quad \text{if } y^{(i)}=1\\
+\theta^Tx^{(i)}\ll -1 & \quad \text{if } y^{(i)}=0
+\end{cases}
+$$
+
+Instead of giving a single linear decision boundary, support vector machine is likely to give a boundary with margin which is more ideal for classification. That is why support vector machine is also called large margin classifier. 
+
+In the situation of outliers, when $C$ is very large, the decision boundary will be sensitive to the outlier. Otherwise, when $c$ is not too large, the decision boundary may not change.
+
+![12-2-2](12-2-2.png)
+
