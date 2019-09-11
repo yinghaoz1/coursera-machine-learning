@@ -1210,3 +1210,43 @@ Assume feature $x\in \R^{n+1}$ has insufficient information to predict $y$ accur
 - If we use a very large training set (unlikely to overfit), it will have **low variance** and $J_{train}(\theta) \approx J_{test}(\theta)$.
 - By putting it together, $J_{test}(\theta)$ will be small.
 
+# 12. Support Vector Machine
+## 12.1 Optimization Objective
+Recall the hypothesis of logistic regression is that:
+
+$$h_{\theta}(x)=\frac{1}{1+e^{\theta^Tx}}$$
+
+In this function, if $y=1$, we want $h_\theta(x)\approx1$, which requires $\theta^Tx\gg0$. Conversely, if $y=0$, we want $h_\theta(x)\approx0$, which requires $\theta^Tx\ll0$.
+
+Then, let's consider the cost function of logistic regression for one training example:
+
+$$\text{cost}=-(y\log h_\theta(x)+(1-y)\log (1-h_\theta(x)))=-y\log\frac{1}{1+e^{-\theta^Tx}}-(1-y)\log(1-\frac{1}{1+e^{-\theta^Tx}})$$
+
+If $y=1$ or we want($\theta^Tx\gg0$), then $cost=-\log\frac{1}{1+e^{-z}}$, we will slightly change the cost function to $cost_1(z)$.
+
+As the same way, if $y=0$ or we want($\theta^Tx\ll0$), then $cost=-\log(1-\frac{1}{1+e^{-z}})$, we will slightly change the cost function to $cost_0(z)$.
+
+![12-1-1](12-1-1.png)
+
+Thus, for logistic regression, the cost function for the whole dataset is:
+
+$$\min_\theta\frac{1}{m}\sum_{i=1}^m\Big[y^{(i)}\big(-\log h_\theta(x^{(i)})\big)+(1-y^{(i)})\big(-\log(1-h_\theta(x^{(i)}))\big)\Big]+\frac{\lambda}{2m}\sum_{j=1}^n \theta_{j}^2$$
+
+And for the cost function of support vector machine, besides changing two parts to $cost_1$ and $cost_0$, there are still two other things we need to change:
+
+- Firstly, we will get rid of the $\frac{1}{m}$ in the cost function. Removing this constant does not affect the value of $\theta$.
+- Secondly, insteading of writing the cost function as a form of $A+\lambda B$, we will write it as $CA+B$. When $C= \frac{1}{\lambda}$, these two cost function will get the same optimized value. 
+
+So, the cost function for the support vector machine is:
+
+$$\text{cost}=\min_\theta C\sum_{i=1}^m\Big[y^{(i)}cost_1(\theta^Tx^{(i)})+(1-y^{(i)})cost_0(\theta^Tx^{(i)})\Big]+\frac12\sum_{i=1}^n\theta_j^2$$
+
+And for this cost function, the hypothesis for support vector machine is:
+
+$$
+h_\theta(x)=
+\begin{cases}
+1 & \quad \text{if } \theta^Tx\gg 0\\
+0 & \quad\text{otherwise}
+\end{cases}
+$$
