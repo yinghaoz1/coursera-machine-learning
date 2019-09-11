@@ -1,4 +1,5 @@
-$\renewcommand{\vec}[1]{\mathbf{#1}}$
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\usepackage{gensymb}
 
 # 5. Multivariate Linear Regression
 ## 5.1 Multiple Features
@@ -1267,8 +1268,8 @@ $$\min_\theta\frac{1}{2}\sum_{j=1}^n\theta_j^2$$
 $$
 s.t.
 \begin{cases}
-\theta^Tx^{(i)}\gg 1 & \quad \text{if } y^{(i)}=1\\
-\theta^Tx^{(i)}\ll -1 & \quad \text{if } y^{(i)}=0
+\theta^Tx^{(i)}\geq 1 & \quad \text{if } y^{(i)}=1\\
+\theta^Tx^{(i)}\leq -1 & \quad \text{if } y^{(i)}=0
 \end{cases}
 $$
 
@@ -1278,3 +1279,95 @@ In the situation of outliers, when $C$ is very large, the decision boundary will
 
 ![12-2-2](12-2-2.png)
 
+## 12.3 Mathematics Behind Large Margin Classification
+In order to understand the hidden mathematical machenism of support vector machine, we need to first understand vector inner product. Given two vector of $u$ and $v$, we make:
+
+$$
+\vec{u}=
+\begin{bmatrix}
+u_1 \\
+u_2
+\end{bmatrix}
+\text{ }
+\vec{v}=
+\begin{bmatrix}
+v_1 \\
+v_2
+\end{bmatrix}
+$$
+
+We set the length of vector $\|\vec{u}\|=\sqrt{u_1^2+u_2^2}$ and $\|\vec{u}\|\in\R$. We also set $p$ is the **signed** length of projection of $\vec{v}$ onto $\vec{u}$, that is, if the angle between $\vec{v}$ and $\vec{u}$ is below $90^{\circ}$, then $p>0$; otherwise, $p<0$. Also, $p\in\R$. Finally, we can get:
+
+$$\vec{u}^T\vec{v}=p\cdot\|\vec{u}\|=u_1v_1+u_2v_2$$
+
+And this result also equals to $\vec{v}^T\vec{u}$.
+
+![12-3-1](12-3-1.png)
+
+Getting back to the cost function of support vector machine, we recall that the cost function is:
+
+$$\min_\theta\frac{1}{2}\sum_{j=1}^n\theta_j^2$$
+
+$$
+s.t.
+\begin{cases}
+\theta^Tx^{(i)}\geq 1 & \quad \text{if } y^{(i)}=1\\
+\theta^Tx^{(i)}\leq -1 & \quad \text{if } y^{(i)}=0
+\end{cases}
+$$
+
+In order to better understand the decision boundary, let's do some simplications: let $\theta_0=0$ and $n=2$. By doing this, the cost function can be written as:
+
+$$\min_\theta\frac{1}{2}\sum_{j=1}^n\theta_j^2=\frac{1}{2}(\theta_1^2+\theta_2^2)=\frac{1}{2}(\sqrt{\theta_1^2+\theta_2^2})^2=\frac{1}{2}\|\theta\|^2$$
+
+Also, the constraint part can be written as:
+
+$$\theta^Tx^{(i)}=p^{(i)}\cdot\|\theta\|=\theta_1x_1^{(i)}+\theta_2x_2^{(i)}$$
+
+where $p^{(i)}$ is the projection of $x^{(i)}$ onto the vector $\theta$. 
+
+![12-3-2](12-3-2.png)
+
+Given a very large $C$ and the simplifications and given that $\theta$ is perpendicular to the decision boundary, if we choose the decision boundary in the left side, we will get a very small $p^{(i)}$ (for both positive and negative). If we want to satisfy the constraint, we need to make $\|\theta\|$ very large, which will cause the cost, $\frac{1}{2}\|\theta\|^2$, to be very large.
+
+Conversly, if we choose the boundary on the right, we will get a large $p^{(i)}$ and make $\|\theta\|$ can be small. 
+
+## 12.4 Kernals I
+For a non-linear classification problem, the hypothesis is:
+
+$$
+h_\theta(x)=
+\begin{cases}
+1 & \quad \text{if } \theta_0+\theta_1x_1+\theta_2x_2+\theta_3x_1x_2+\theta_4x_1^2+\theta_5x_2^2+\cdots\geq0\\
+0 & \quad \text{otherwise}
+\end{cases}
+$$
+
+And the condition can be modified to $\theta_0+\theta_1f_1+\theta_2f_2+\theta_3f_3+\theta_4f_4+\theta_5f_5+\cdots\geq0$, where $f_1=x_1,f_2=x_2,f_3=x_1x_2,f_4=x_1^2,f_5=x_2^2$. Is there a different or better choice of the features $f_i$?
+
+To answer this question, we will introduce the concept of kernal. Given $x$, we can compute new features depending on proximity to different landmarks. For each landmark $l^{(i)}$, we set:
+
+$$f_i=\text{similarity}(x,l^{(i)})=\exp\Big(-\frac{\|x-l^{(i)}\|^2}{2\sigma^2}\Big)=\exp\Big(-\frac{\sum_{j=1}^n(x_j-l_j^{(i)})^2}{2\sigma^2}\Big)$$
+
+The similarity function is called Gussian similarity and can be written as $k(x,l^{(i)})$. Specifically:
+
+- If $x\approx l^{(i)}$, we can get $f_i\approx1$
+- If $x$ is far from $l^{(i)}$, we can get $f_i\approx0$
+
+$\sigma$ is the parameter of the kernal function. The bigger it is, the broader the contour will be.
+
+![12-4-1](12-4-1.png)
+
+Thus, the hypothesis can be modified into:
+
+$$
+h_\theta(x)=
+\begin{cases}
+1 & \quad \text{if } \theta_0+\theta_1f_1+\theta_2f_2+\theta_3f_3+\theta_4f_4+\theta_5f_5+\cdots\geq0\\
+0 & \quad \text{otherwise}
+\end{cases}
+$$
+
+Given the parameter $\theta$, we can draw the non-linear decision boundary by juding if the point $x$ is far from all of the landmarks.
+
+## 12.5 Kernels II
