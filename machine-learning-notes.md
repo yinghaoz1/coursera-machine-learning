@@ -1463,3 +1463,71 @@ Sometimes based on different situations, we may need to consider whether to choo
 - If $n$ is small and $m$ is intermediate, we use SVM with Gaussian kernel.
 - If $n$ is small and $m$ is large, we create and add more features, then use logistic regression or SVM without a kernel.
 - Neural network is likely to work well for most of these settings, but may be slower to train.
+
+# 13. Clustering
+## 13.1 K-Means Algorithm
+K-means algorithm has two inputs:
+
+- $K$ (number of clusters)
+- Training set $\{x^{(1)},x^{(2)},\dots,x^{(m)}\}$
+
+In this algorithm, we set $x^{(i)}\in\R^n$ by dropping $x_0=1$ convention.
+
+Then, it will implement the following algorithm:
+
+Randomly initialize $K$ to  cluster centroids $\mu_1,\mu_2,\dots,\mu_K\in\R^n$
+
+`repeat`{
+   
+for $i=1$ to $m${
+
+$c^{(i)}:=$ index (from $1$ to $K$) of cluster centroid closest to $x^{(i)}$
+
+}
+
+for $k=1$ to $K${
+
+$\mu_{k}:=$ average (mean) of points assigned to cluster $k$
+
+}
+
+}
+
+The first for loop indicates **cluster assignment step**, which means $c^{(i)}$ will be assigned with a certain number $k$ so that $\min_k\|x^{(i)}-\mu_k\|^2$. The second for loop indicates **move centroid step**. For example, if $\mu_2$ has a cluster of $x^{(1)},x^{(5)},x^{(6)},x^{(10)}$, that is, $c^{(1)}=2,c^{(5)}=2,c^{(6)}=2,c^{(10)}=2$, then we move $\mu_2$ so that $\mu_2=\frac{1}{4}(x^{(1)}+x^{(5)}+x^{(6)}+x^{(10)})\in\R^n$
+
+K-means algorithms can also be used to non-separated clusters. For example, if we want to make segments for T-shirt sizing for people with different heights and weights. We can use k-means algorithm to make segments for small. medium, and large size.
+
+## 13.2 Optimization Objective
+Let's first clarify some notifications:
+
+- $c^{(i)}=$ index of cluster ($1,2,...,K$) to which example $x^{(i)}$ is currently assigned
+- $\mu_k=$ cluster centroid $k$ ($\mu_k\in\R^n$)
+- $\mu_{c^{(i)}}=$ cluster centroid of cluster to which example $x^{(i)}$ has been assigned
+
+So the cost function of k-means algorithm is:
+
+$$J(c^{(1)},\dots,c^{(m)},\mu_1,\dots,\mu_K)=\frac{1}{m}\sum_{i=1}^m\|x^{(1)}-\mu_{c^{(i)}}\|^2$$
+
+And the optimization objective is:
+
+$$\min_{c^{(1)},\dots,c^{(m)},\mu_1,\dots,\mu_K}J(c^{(1)},\dots,c^{(m)},\mu_1,\dots,\mu_K)$$
+
+Recall our k-means algorithm is:
+
+`repeat`{
+   
+for $i=1$ to $m${
+
+$c^{(i)}:=$ index (from $1$ to $K$) of cluster centroid closest to $x^{(i)}$
+
+}
+
+for $k=1$ to $K${
+
+$\mu_{k}:=$ average (mean) of points assigned to cluster $k$
+
+}
+
+}
+
+The cluster assignment step is to minimize $J$ w.r.t. $c^{(1)},\dots,c^{(m)}$ holding $\mu_1,\dots,\mu_K$ fixed. The move centroid step is to minimize $J$ w.r.t. $\mu_1,\dots,\mu_K$ holding $c^{(1)},\dots,c^{(m)}$ fixed.
