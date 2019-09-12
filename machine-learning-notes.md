@@ -1508,7 +1508,7 @@ So the cost function of k-means algorithm is:
 
 $$J(c^{(1)},\dots,c^{(m)},\mu_1,\dots,\mu_K)=\frac{1}{m}\sum_{i=1}^m\|x^{(1)}-\mu_{c^{(i)}}\|^2$$
 
-And the optimization objective is:
+This is also called **distortion function**. And the optimization objective is:
 
 $$\min_{c^{(1)},\dots,c^{(m)},\mu_1,\dots,\mu_K}J(c^{(1)},\dots,c^{(m)},\mu_1,\dots,\mu_K)$$
 
@@ -1531,3 +1531,33 @@ $\mu_{k}:=$ average (mean) of points assigned to cluster $k$
 }
 
 The cluster assignment step is to minimize $J$ w.r.t. $c^{(1)},\dots,c^{(m)}$ holding $\mu_1,\dots,\mu_K$ fixed. The move centroid step is to minimize $J$ w.r.t. $\mu_1,\dots,\mu_K$ holding $c^{(1)},\dots,c^{(m)}$ fixed.
+
+## 13.3 Random Initialization
+When we implement the random initialization in the first step, we can do that:
+
+- We should have $K<m$.
+- Randomly pick $K$ training examples,
+- Set $\mu_1,\dots,\mu_K$ equal to these $K$ examples.
+
+Sometimes the cost function can be stuck in local optimas. The way to solve this issue is to do random initialization many times:
+
+for $i=1$ to $100${
+
+Randomly initialize K-means.
+
+Run K-means. Get $c^{(1)},\dots,c^{(m)},\mu_1,\dots,\mu_K$.
+
+Compute cost function (distortion) $J(c^{(1)},\dots,c^{(m)},\mu_1,\dots,\mu_K)$
+
+}
+
+Pick clustering that gave lowest cost $J(c^{(1)},\dots,c^{(m)},\mu_1,\dots,\mu_K)$
+
+This method is suitable for the situation when $n$ is small.
+
+## 13.4 Choosing the Number of Clusters
+One method for choosing $K$ is elbow method, but sometimes it may be hard to distinguish the elbow.
+
+![13-4-1](13-4-1.png)
+
+Someiimes, you've running K-means to get clusters to use for some later/downstream purpose. Evaluate K-means based on a metric for how well it performs for that later purpose.
