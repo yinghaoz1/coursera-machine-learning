@@ -1561,3 +1561,9 @@ One method for choosing $K$ is elbow method, but sometimes it may be hard to dis
 ![13-4-1](13-4-1.png)
 
 Someiimes, you've running K-means to get clusters to use for some later/downstream purpose. Evaluate K-means based on a metric for how well it performs for that later purpose.
+
+# 14. Dimensionality Reduction
+## 14.1 Motivation: Data Compression and Data Visualization
+Suppose we apply dimensionality reduction to a dataset of m examples $\{x^{(1)}, x^{(2)}, \dots, x^{(m)}\}$, where $x^{(i)}\in\R^n$. As a result of this, we will get out a lower dimensional dataset $\{z^{(1)}, z^{(2)},\dots, z^{(m)}\}$ of $m$ examples where $z^{(i)}\in\R^k$ for some value of $k$ and $k\leq n$.
+
+## 14.2 Principal Component Analysis (PCA) Problem Formulation
