@@ -1567,3 +1567,8 @@ Someiimes, you've running K-means to get clusters to use for some later/downstre
 Suppose we apply dimensionality reduction to a dataset of m examples $\{x^{(1)}, x^{(2)}, \dots, x^{(m)}\}$, where $x^{(i)}\in\R^n$. As a result of this, we will get out a lower dimensional dataset $\{z^{(1)}, z^{(2)},\dots, z^{(m)}\}$ of $m$ examples where $z^{(i)}\in\R^k$ for some value of $k$ and $k\leq n$.
 
 ## 14.2 Principal Component Analysis (PCA) Problem Formulation
+PCA is used to reduce the dimensionality. If we reduce from n-dimension to k-dimension, we need to find $k$ vectors $u^{(1)}, u^{(2)},\dots,u^{(k)}$ onto which to project the data, so as to minimize the projection error. 
+
+Although PCA is similar to linear regression, the principles inside these two algorithms are different. In linear regression, what we're doing is we're fitting a straight line so as to minimize the square error between points and this straight line. So these blue lines are the vertical distance between the point and the value predicted by the hypothesis. In contrast, the blue lines in PCA try to minimize the magnitude of these blue lines, which are drawn at an angle. 
+
+![14-2-1](14-2-1.png)
