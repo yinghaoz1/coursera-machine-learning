@@ -1572,3 +1572,79 @@ PCA is used to reduce the dimensionality. If we reduce from n-dimension to k-dim
 Although PCA is similar to linear regression, the principles inside these two algorithms are different. In linear regression, what we're doing is we're fitting a straight line so as to minimize the square error between points and this straight line. So these blue lines are the vertical distance between the point and the value predicted by the hypothesis. In contrast, the blue lines in PCA try to minimize the magnitude of these blue lines, which are drawn at an angle. 
 
 ![14-2-1](14-2-1.png)
+
+## 14.3 Pinciple Component Analysis Algorithm
+Before implementing PCA algorithm, we need to implement **data preprocessing** first. Given the training set $x^{(1)},x^{(2)},\dots,x^{(m)}$, the preprocessing (feature scaling/mean normalization) is:
+
+- $\mu_j=\frac{1}{m}\sum_{i=1}^mx_j^{(i)}$
+- Replace each $x_j^{(i)}$ with $x_j-\mu_j$
+
+If different features on different scales (e.g., $x_1=$ size of house, $x_2=$ number of bedrooms), scale features to have comparable range of values, such as replacing $x_j^{(i)}$ with $\frac{x_j^{(1)}-\mu_j}{s_j}$. 
+
+Next, PCA algorithm is:
+
+- Compute "covariance matrix":
+
+$$\Sigma=\frac{1}{m}\sum_{i=1}^m(x^{(i)})(x^{(i)})^T$$
+
+where $x^{(i)}\in\R^{n\times1},(x^{(i)})^T\in\R^{1\times n}$
+
+- Compute "eigenvectors" of matrix $\Sigma$:
+
+```matlab
+[U, S, V] = svd(Sigma);
+```
+
+The function `svd` stands for "singular value decomposition". From this function, we get:
+
+$$
+U=
+\begin{bmatrix}
+| & | &  & | \\
+u^{(1)} & u^{(2)} & \cdots & u^{(n)} \\
+| & | &  & | \\
+\end{bmatrix}
+\in\R^{n\times n}
+$$
+
+In order to transfer from $x\in\R^n$ to $z\in\R^k$. we select the first $k$ vectors to get $U_reduce$:
+
+$$
+U_{reduce}=
+\begin{bmatrix}
+| & | &  & | \\
+u^{(1)} & u^{(2)} & \cdots & u^{(k)} \\
+| & | &  & | \\
+\end{bmatrix}
+$$
+
+So,
+
+$$
+z^{(i)}=
+U_{reduce}^Tx^{(i)}=
+\begin{bmatrix}
+| & | &  & | \\
+u^{(1)} & u^{(2)} & \cdots & u^{(k)} \\
+| & | &  & | \\
+\end{bmatrix}^Tx^{(i)}
+=
+\begin{bmatrix}
+-- & (u^{(1)})^T & -- \\
+-- & (u^{(2)})^T & -- \\
+ & \vdots &  \\
+-- & (u^{(k)})^T & -- \\
+\end{bmatrix}
+x^{(i)}
+$$
+
+where $U_{reduce}\in\R^{n\times k},U_{reduce}^T\in\R^{k\times n},x^{(i)}\in\R^{n\times1},z^{(i)}\in\R^{k\times 1}$
+
+In `matlab`, after mean normalization (ensure every feature has zero mean) and optionally feature scaling, the algorithm is:
+
+```matlab
+Sigma = (1/m)*X'*X;
+[U, S, V] = svd(Sigma);
+Ureduce=U(:, 1:k);
+Z = Ureduce'*X;
+```
