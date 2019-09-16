@@ -1648,3 +1648,74 @@ Sigma = (1/m)*X'*X;
 Ureduce=U(:, 1:k);
 Z = Ureduce'*X;
 ```
+
+## 14.4 Reconstruction from Compressed Representation
+If we want to reconstruct from $k$-dimension to $n$-dimension, we can calculate the approximation of $x^{(i)}$:
+
+$$x_{approx}^{(i)}=U_{reduce}z^{(i)}$$
+
+where $U_{reduce}\in\R^{n\times k},z^{(i)}\in\R^{k\times1},x_{approx}^{(i)}\in\R^{n\times 1}$
+
+## 14.5 Choosing the Number of Principal Components
+In order to choose the number of principal components $k$, we need to calculate two things:
+
+- Average squared projection error:
+
+$$\frac{1}{m}\sum_{i=1}^m\|x^{(i)}-x_{approx}^{(i)}\|^2$$
+
+- Total variation in the data:
+
+$$\frac{1}{m}\sum_{i=1}^m\|x^{(i)}\|^2$$
+
+Typically, choose $k$ to be smallest value so that
+
+$$\frac{\frac{1}{m}\sum_{i=1}^m\|x^{(i)}-x_{approx}^{(i)}\|^2}{\frac{1}{m}\sum_{i=1}^m\|x^{(i)}\|^2}\leq0.01$$
+
+Another way to say that is "$99\%$ of variance is retained".
+
+So the algorithm of choosing $k$ is:
+
+- Try PCA with $k=1$
+- Compute $U_{reduce},z^{(1)},z^{(2)},\dots,z^{(m)},x^{(1)}_{approx},\dots,x^{(m)}_{approx}$
+- Check if $\frac{\frac{1}{m}\sum_{i=1}^m\|x^{(i)}-x_{approx}^{(i)}\|^2}{\frac{1}{m}\sum_{i=1}^m\|x^{(i)}\|^2}\leq0.01$?
+
+However, this algorithm is inefficient because for each $k$ we need to calculate PCA. In practice, recall the `matlab` function:
+
+```matlab
+[U, S, V] = svd(Sigma);
+```
+
+In this function, we have:
+
+$$
+S=
+\begin{bmatrix}
+S_{11} & & & \\
+ & S_{22} & & \\
+ & & \ddots & \\
+ & & & S_{nn}\\
+\end{bmatrix}
+$$
+
+So we just need to pick the smallest value of $k$ for which
+
+$$
+\frac{\sum_{i=1}^{k}S_{ii}}{\sum_{i=1}^{n}S_{ii}}\geq 0.99
+$$
+
+that is, making sure $99\%$ of variance retained.
+
+## 14.6 Advice for Applyging PCA
+Often we use PCA to speed up supervised learning algorithm. Given the dataset of $(x^{(1)},y^{(1)}),(x^{(2)},y^{(2)}),\dots,(x^{(m)},y^{(m)})$, we first extract inputs to unlabeled datasets $x^{(1)},x^{(2)},\dots,x^{(m)}\in\R^n$. After using PCA, we get $z^{(1)},z^{(2)},\dots,z^{(m)}\in\R^k$. And we get a new training set $(z^{(1)},y^{(1)}),(z^{(2)},y^{(2)}),\dots,(z^{(m)},y^{(m)})$
+
+**Note**: Mapping $x^{(i)}\rightarrow z^{(i)}$ should be define by running PCA only on the training set. This mapping can be applied as well to the examples $x_{cv}^{(i)}$ and $x_{text}^{(i)}$ in the cross validation and test sets. 
+
+The main two applications of PCA are:
+- Compression: choose $k$ by one percentage of variance retain
+  - Reduce memory/disk needed to store data
+  - Speed up learning algorithm
+- Visualization: $k=2$ or $k=3$
+
+One bad use of PCA is to prevent overfitting. Use $z^{(i)}$ instead of $x^{(i)}$ to reduce the number of features to $k<n$. Thus, we have fewer features and it is less likely to overfit. This might work OK, but isn't a good way to address overfitting. we should use regularization instead.
+
+Another thing is that before implementing PCA, first try running whatever you want to do with the original/raw data $x^{(i)}$. Only if that doesn't do what you want, then implement PCA and consider using $z^{(i)}$
