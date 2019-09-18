@@ -1719,3 +1719,5 @@ The main two applications of PCA are:
 One bad use of PCA is to prevent overfitting. Use $z^{(i)}$ instead of $x^{(i)}$ to reduce the number of features to $k<n$. Thus, we have fewer features and it is less likely to overfit. This might work OK, but isn't a good way to address overfitting. we should use regularization instead.
 
 Another thing is that before implementing PCA, first try running whatever you want to do with the original/raw data $x^{(i)}$. Only if that doesn't do what you want, then implement PCA and consider using $z^{(i)}$.
+
+## 14. 1
