@@ -1720,4 +1720,125 @@ One bad use of PCA is to prevent overfitting. Use $z^{(i)}$ instead of $x^{(i)}$
 
 Another thing is that before implementing PCA, first try running whatever you want to do with the original/raw data $x^{(i)}$. Only if that doesn't do what you want, then implement PCA and consider using $z^{(i)}$.
 
-## 14. 1
+# 15. Anomaly Detection
+## 15.1 Problem Motivation
+Given the dataset $\{x^{(1)}, x^{(2)}, \dots ,x^{(m)}\}$, $x_{test}$ will be anomalous if we have $p(x_{test})<\epsilon$ for a certain model $p(x)$, and will be OK if $p(x_{test})\geq \epsilon$. 
+
+One example of anomaly detection is fraud detection. In this example, we set $x^{(i)}=$ features of user $i$'s activities. By modeling $p(x)$ from data, we can identify unusual users by checking which have $p(x)<\epsilon$.
+
+Another example will be monitoring computers in a data center. Say $x^{(i)}=$ features of machine $i$, $x_1=$ memory use, $x_2=$ number of disk accesses/sec, $x_3=$ CPU load, $x_4=$ CPU load/network traffic.
+
+## 15.2 Gaussian Distribution
+Say $x\in\R$. If $x$ is a distributed Gaussian with mean $\mu$, variance $\sigma^2$. We can write $x\sim\mathcal{N}(\mu, \sigma^2)$. $\sigma$ is called standard deviation. The normal distribution formula is:
+
+$$p(x;\mu,\sigma^2)=\frac{1}{\sqrt{2\pi}\sigma}\exp \Big(-\frac{(x-\mu)^2}{2\sigma^2}\Big)$$
+
+Given the dataset $\{x^{(1)}, x^{(2)}, \dots ,x^{(m)}\}$ where $x^{(i)}\in\R$. We can esmitate the population mean and variance as: 
+
+$$\hat\mu=\frac{1}{m}\sum_{i=1}^{m}x^{(i)}, \hat\sigma^2=\frac{1}{m}\sum_{i=1}^m(x^{(i)}-\hat\mu)^2$$
+
+## 15.3 Algorithm
+Given the training set $\{x^{(1)}, x^{(2)}, \dots ,x^{(m)}\}$ and each example $x\in\R^n$, if for each $j$ we have $x_j\sim\mathcal{N}(\mu_j,\sigma_j^2)$, then we can model:
+
+$$p(x)=p(x_1;\mu_1,\sigma_1^2)\cdot p(x_2;\mu_2,\sigma_2^2)\cdots p(x_n;\mu_n,\sigma^2_n)=\prod_{j=1}^np(x_j;\mu_j,\sigma_j^2)$$
+
+Thus, the anomaly detection algorithm is:
+
+1. Choose features $x_i$ that you think might be indicative of anomalous examples.
+2. Fit parameters $\mu_1,\dots,\mu_n,\sigma_1^2,\dots,\sigma_n^2$
+
+$$\mu_j=\frac{1}{m}\sum_{i=1}^mx_j^{(i)}$$
+
+$$\sigma_j^2=\frac{1}{m}\sum_{i=1}^m(x_j^{(i)}-\mu_j)^2$$
+
+We can also vectorize the formula to write it as:
+
+$$
+\mu=
+\begin{bmatrix}
+\mu_1 \\
+\mu_2 \\
+\vdots \\
+\mu_j \\
+\end{bmatrix}
+=\frac{1}{m}\sum_{i=1}^mx^{(i)}
+$$
+
+$$
+\sigma^2=
+\begin{bmatrix}
+\sigma_1^2 \\
+\sigma_2^2  \\
+\vdots \\
+\sigma_j^2 \\
+\end{bmatrix}
+=\frac{1}{m}\sum_{i=1}^m(x^{(i)}-\mu)^2
+$$
+
+3. Given new example $x$, compute $p(x)$:
+
+$$p(x)=\prod_{j=1}^np(x_j;\mu_j,\sigma_j^2)=\prod_{j=1}^n\frac{1}{\sqrt{2\pi}\sigma_j}\exp\Big(-\frac{(x_j-\mu_j)^2}{2\sigma_j^2}\Big)$$
+
+Anomaly if $p(x)<\epsilon$.
+
+## 15.4 Developing and Evaluating an Anormaly Detection System
+The process and evaluation of algorithm evaluation is:
+
+1. Fit model $p(x)$ on training set $\{x^{(1)},\dots,x^{(m)}\}$
+2. On a cross validation/test example $x$, predict
+
+$$
+y=
+\begin{cases}
+1 & \quad \text{if } p(x)<\epsilon \text{ (anomaly)}\\
+0 & \quad \text{if } p(x)\geq\epsilon \text{ (normal)}
+\end{cases}
+$$
+
+3. Possible evaluation matrix:
+- True positive, false positive, false negative, true negative
+- Precision/Recall
+- $\text{F}_1$-score
+
+4. Can also use cross validation set to choose parameter $\epsilon$.
+
+## 15.5 Anomaly Detection vs. Supervised Learning
+The situation for using anomaly detection and supervised learning is different:
+
+**Anomaly Detection**:
+- Very small number of positive examples ($y=1$). ($0-20$ is common).
+- Large number of negative ($y=0$) examples.
+- Many different "types" of anomalies. Hard for any algorithm to learn from postiive examples what the anomalies look like.
+- Future anomalies may look nothing like any of the anomalous examples we've seen so far. 
+
+**Supervised Learning**:
+- Large number of positive and negative examples.
+- Enough positive examples for algorithm to get a sense of what positive examples are like, future positive examples likely to be similar to ones in the training set.
+
+Some examples of applications are:
+
+**Anomaly Detection**:
+- Fraud detection
+- Manufactuing (e.g. aircraft engines)
+- Monitoring machines in a data center
+
+These examples can be shifted to supervised learning if there are lots of positive examples.
+
+**Supervised Learning**:
+- Email spam classification
+- Weather prediction (sunny/rainy/etc)
+- Cancer classification
+
+## 15.6 Choose What Features to Use
+Suppose your anomaly detection algorithm is performing poorly and outputs a large value of $p(x)$ for many normal examples and for many anomalous examples in your cross validation dataset, it is likely to help if we come up with more features to distinguish between the normal and the anomalous examples.
+
+## 15.7 Multivariate Gaussian Distribution
+Given the parameters $\mu\in\R^n, \Sigma\in\R^{n\times n}$(covariance matrix), the formula of multivariate Gaussian (Normal) Distribution is:
+
+$$
+p(x;\mu,\Sigma)=\frac{1}{(2\pi)^{n/2}|\Sigma|^{1/2}}\exp\Big(-\frac12(x-\mu)^T\Sigma^{-1}(x-\mu)\Big)
+$$
+
+where $|\Sigma|$ is the determinant of $\Sigma$ and it can be typed in `MATLAB` as `det(Sigma)`.
+
+The $\mu$ represents the position of the highest point. The diagonal in $\Sigma$ represents the shape of the bell curve in each dimension (the bigger, the broader), while the off-diagonal represents the linear relationship for each dimension (positive for positive relationship, negative for negative relationship).
