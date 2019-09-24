@@ -1842,3 +1842,45 @@ $$
 where $|\Sigma|$ is the determinant of $\Sigma$ and it can be typed in `MATLAB` as `det(Sigma)`.
 
 The $\mu$ represents the position of the highest point. The diagonal in $\Sigma$ represents the shape of the bell curve in each dimension (the bigger, the broader), while the off-diagonal represents the linear relationship for each dimension (positive for positive relationship, negative for negative relationship).
+
+## 15.8 Anomaly Detection Using the Multivariate Gaussian Distribution
+The anomaly detection with the multivariate Gaussian has the following alogrithm:
+
+1. Fit model $p(x)$ by setting:
+
+$$\mu=\frac{1}{m}\sum_{i=1}^mx^{(i)}$$
+
+$$\Sigma=\frac{1}{m}\sum_{i=1}^m(x^{(i)}-\mu)(x^{(i)}-\mu)^T$$
+
+2. Given a new example $x$, compute:
+
+$$
+p(x;\mu,\Sigma)=\frac{1}{(2\pi)^{n/2}|\Sigma|^{1/2}}\exp\Big(-\frac12(x-\mu)^T\Sigma^{-1}(x-\mu)\Big)
+$$
+
+Flag an anomaly if $p(x)<\epsilon$
+
+Recall that the original model is:
+
+$$p(x)=\prod_{j=1}^np(x_j;\mu_j,\sigma_j^2)$$
+
+It corresponds to multivariate Gaussian model where
+
+$$\Sigma=
+\begin{bmatrix}
+\sigma_1^2 & & & \\
+& \sigma_2^2 & & \\
+& & \ddots & \\
+& & & \sigma_n^2 \\
+\end{bmatrix}$$
+
+The original model is suitable for:
+- Manually create features to capture anomalies where $x_1,x_2$ take unusual combinations of values.
+- Computationally cheaper (alternatively, scales better to large)
+- Ok even if $m$ (training set size) is small
+
+The multivariate Gaussian model is suitable for:
+- Automatically captures correlations between features
+- Computationally more expensive
+- Must have $m>n$ or else $\Sigma$ is non-invertable. The rule of thumb is $m\geq n$
+
