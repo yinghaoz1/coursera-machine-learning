@@ -1884,3 +1884,41 @@ The multivariate Gaussian model is suitable for:
 - Computationally more expensive
 - Must have $m>n$ or else $\Sigma$ is non-invertable. The rule of thumb is $m\geq n$
 
+# 16. Recommendater Systems
+## 16.1 Content-based Recommendations
+Here are some notations for recommender systems:
+
+- $r(i,j)=1$ if user $j$ has rated movie $i$ ($0$ otherwise)
+- $y^{(i,j)}=$ rating by user $j$ on movie $i$ (if defined)
+- $\theta^{(j)}=$ parameter vector for user $j$
+- $x^{(i)}=$ feature vector for movie $i$
+- $m^{(j)}=$ no. of movies rated by user $j$
+
+Thus, for user $j$ and movie $i$, the predicted rating is $(\theta^{(j)})^Tx^{(i)}$
+
+To learn $\theta^{(j)}$ (parameter for user $j$), the optimization objective of the cost function is:
+
+$$\min_{\theta^{(j)}}\frac{1}{2}\sum_{i:r(i,j)=1}\big((\theta^{(j)})^Tx^{(i)}-y^{(i,j)}\big)^2+\frac{\lambda}{2}\sum_{k=1}^n(\theta_k^{(j)})^2$$
+
+To learn $\theta^{(1)},\theta^{(2)},\dots,\theta^{(n_u)}$, the optimization objective of the cost function is:
+
+$$\min_{\theta^{(1)},\dots,\theta^{(n_u)}}\frac{1}{2}\sum_{j=1}^{n_u}\sum_{i:r(i,j)=1}\big((\theta^{(j)})^Tx^{(i)}-y^{(i,j)}\big)^2+\frac{\lambda}{2}\sum_{j=1}^{n_u}\sum_{k=1}^n(\theta_k^{(j)})^2$$
+
+And the gradient descent update is:
+
+$$\theta_k^{(j)}:=\theta_k^{(j)}-\alpha\sum_{i:r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})x_k^{(i)}$$ 
+(for $k=0$)
+
+$$\theta_k^{(j)}:=\theta_k^{(j)}-\alpha\bigg(\sum_{i:r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})x_k^{(i)}+\lambda\theta_k^{(j)}\bigg)$$ 
+(for $k\neq0$)
+
+## 16.2 Collaborative Filtering
+Given $\theta^{(1)},\dots,\theta^{(n_u)}$, we can learn $x^{(i)}$ by minimizing the cost function:
+
+$$\min_{x^{(i)}}\frac{1}{2}\sum_{j:r(i,j)=1}((\theta^{((j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{k=1}^n(x_k^{(i)})^2$$
+
+Given $\theta^{(1)},\dots,\theta^{(n_u)}$, we can learn $x^{(1)},\dots,x^{(n_m)}$ by minimizing the cost function:
+
+$$\min_{x^{(1)},\dots,x^{(n_m)}}\frac{1}{2}\sum_{i=1}^{n_m}\sum_{j:r(i,j)=1}((\theta^{((j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{i=1}^{n_m}\sum_{k=1}^n(x_k^{(i)})^2$$
+
+Thus, given $x^{(1)},\dots,x^{(n_m)}$ (and movie rating), we can estimate $\theta^{(1)},\dots,\theta^{(n_u)}$. Also, given $\theta^{(1)},\dots,\theta^{(n_u)}$, we can estimate $x^{(1)},\dots,x^{(n_m)}$. For collaborative filtering, we guess $\theta$ first and then iteratively infer $x$ and $\theta$.
