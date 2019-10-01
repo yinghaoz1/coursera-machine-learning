@@ -1922,3 +1922,106 @@ Given $\theta^{(1)},\dots,\theta^{(n_u)}$, we can learn $x^{(1)},\dots,x^{(n_m)}
 $$\min_{x^{(1)},\dots,x^{(n_m)}}\frac{1}{2}\sum_{i=1}^{n_m}\sum_{j:r(i,j)=1}((\theta^{((j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{i=1}^{n_m}\sum_{k=1}^n(x_k^{(i)})^2$$
 
 Thus, given $x^{(1)},\dots,x^{(n_m)}$ (and movie rating), we can estimate $\theta^{(1)},\dots,\theta^{(n_u)}$. Also, given $\theta^{(1)},\dots,\theta^{(n_u)}$, we can estimate $x^{(1)},\dots,x^{(n_m)}$. For collaborative filtering, we guess $\theta$ first and then iteratively infer $x$ and $\theta$.
+
+## 16.3 Collaborative Filtering Algorithm
+Recall that in the last section, we estimate the parameters $\theta$ and $x$ sequentially. However, there is another way that we can minimize $x^{(1)},\dots,x^{(n_m)}$ and $\theta^{(1)},\dots,\theta^{(n_u)}$ simultaneously. Thus, the cost function will be written as:
+
+$$J(x^{(1)},\dots,x^{(n_m)},\theta^{(1)},\dots,\theta^{(n_u)})=\frac{1}{2}\sum_{(i,j):r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{i=1}^{n_m}\sum_{k=1}^{n}(x_k^{(i)})^2+\frac{\lambda}{2}\sum_{j=1}^{n_u}\sum_{k=1}^{n}(\theta_k^{(j)})^2$$
+
+where the objective is to:
+
+$$\min_{x^{(1)},\dots,x^{(n_m)},\theta^{(1)},\dots,\theta^{(n_u)}}J(x^{(1)},\dots,x^{(n_m)},\theta^{(1)},\dots,\theta^{(n_u)})$$
+
+One thing to note is that in this function, we ignore $x_0=1$ and $\theta_0=1$ so that $x\in\R^n$ and $\theta\in\R^n$.
+
+Overall, the collaborative filtering algorithm is:
+
+1. Initialize $x^{(1)},\dots,x^{(n_m)},\theta^{(1)},\dots,\theta^{(n_u)}$ to small random values. This serves as symmetry breaking (similar to the random initialization of a neural network’s parameters) and ensures the algorithm learns features $x^{(1)}, \dots, x^{(n_m)}$ that are different from each other.
+   
+2. Minimize $J(x^{(1)},\dots,x^{(n_m)},\theta^{(1)},\dots,\theta^{(n_u)})$ using gradient descent (or an advanced optimization algorithm). E.g. for every $j=1,\dots,n_u,i=1,\dots,n_m$:
+
+$$x_k^{(i)}:=x_k^{(i)}-\alpha\Bigg(\sum_{j:r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})\theta_k^{(j)}+\lambda x_k^{(i)}\Bigg)$$
+
+$$\theta_k^{(j)}:=\theta_k^{(j)}-\alpha\Bigg(\sum_{i:r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})x_k^{(i)}+\lambda \theta_k^{(j)}\Bigg)$$
+
+3. For a user $j$ with parameters $\theta$ and a movie $i$ with (learned) features $x$, predict a star rating of $(\theta^{(j)})^T(x^{(i)})$.
+
+## 16.4 Vectorization: Low Rank Matrix Factorization
+In a recommender system with $n_u$ users and $n_m$ movies, the predicted ratings can be represented as:
+
+$$
+Y=
+\begin{bmatrix}
+(\theta^{(1)})^Tx^{(1)} & (\theta^{(2)})^Tx^{(1)} & \cdots & (\theta^{(n_u)})^Tx^{(1)} \\
+(\theta^{(1)})^Tx^{(2)} & (\theta^{(2)})^Tx^{(2)} & \cdots & (\theta^{(n_u)})^Tx^{(2)} \\
+\vdots & \vdots & & \vdots \\
+(\theta^{(1)})^Tx^{(n_m)} & (\theta^{(2)})^Tx^{(n_m)} & \cdots & (\theta^{(n_u)})^Tx^{(n_m)} \\
+\end{bmatrix}
+$$
+
+If we vectorize the $X$ and $\Theta$ as:
+
+$$
+X=
+\begin{bmatrix}
+- & (x^{(1)})^T & - \\
+- & (x^{(2)})^T & - \\
+  & \vdots & \\
+- & (x^{(n_m)})^T & - \\  
+\end{bmatrix}
+,
+\Theta = 
+\begin{bmatrix}
+- & (\theta^{(1)})^T & - \\
+- & (\theta^{(2)})^T & - \\
+  & \vdots & \\
+- & (\theta^{(n_u)})^T & - \\  
+\end{bmatrix}
+$$
+
+then we can get:
+
+$$Y=X\Theta^T$$
+
+For each product $i$, we learn a feature vector $x^{(i)}\in\R^n$, even if we can not interpret these features by choosing acceptable words. If we wnat to find movies $j$ related to movie $i$, we can select small $\|x^{(i)}-x^{(j)}\|$ to ensure that movies $j$ and $i$ are similar. For example, if we want to select 5 most similar movies to movie $i$, we find the 5 movies $j$ with the smallest $\|x^{(i)}-x^{(j)}\|$.
+
+## 16.5 Implementational Detail: Mean Normalization
+If we want to predict the rating of a user without any ratings such as
+
+$$
+Y=
+\begin{bmatrix}
+(\theta^{(1)})^Tx^{(1)} & (\theta^{(2)})^Tx^{(1)} & \cdots & (\theta^{(n_u)})^Tx^{(1)} & ? \\
+(\theta^{(1)})^Tx^{(2)} & (\theta^{(2)})^Tx^{(2)} & \cdots & (\theta^{(n_u)})^Tx^{(2)} & ? \\
+\vdots & \vdots & & \vdots & \vdots \\
+(\theta^{(1)})^Tx^{(n_m)} & (\theta^{(2)})^Tx^{(n_m)} & \cdots & (\theta^{(n_u)})^Tx^{(n_m)} & ?\\
+\end{bmatrix}
+$$
+
+, we can compute the average rating vector $\mu$ for each movie
+
+$$
+\mu=
+\begin{bmatrix}
+\mu_1 \\
+\mu_2 \\
+\vdots \\
+\mu_{n_m}
+\end{bmatrix}
+$$
+
+and then subtracted by the original matrix $Y$ to get a new matrix
+
+$$
+Y=
+\begin{bmatrix}
+(\theta^{(1)})^Tx^{(1)}-\mu_1 & (\theta^{(2)})^Tx^{(1)}-\mu_1 & \cdots & (\theta^{(n_u)})^Tx^{(1)}-\mu_1 & ? \\
+(\theta^{(1)})^Tx^{(2)}-\mu_2 & (\theta^{(2)})^Tx^{(2)}-\mu_2 & \cdots & (\theta^{(n_u)})^Tx^{(2)}-\mu_2 & ? \\
+\vdots & \vdots & & \vdots & \vdots \\
+(\theta^{(1)})^Tx^{(n_m)}-\mu_{n_m} & (\theta^{(2)})^Tx^{(n_m)}-\mu_{n_m} & \cdots & (\theta^{(n_u)})^Tx^{(n_m)}-\mu_{n_m} & ? \\
+\end{bmatrix}
+$$
+
+We use this matrix to learn $\theta^{(j)}$ and $x^{(i)}$. And for user $j$ and movie $i$, we can predict the rating as
+
+$$(\theta^{(j)})^Tx^{(i)}+\mu_i$$
