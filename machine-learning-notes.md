@@ -2109,3 +2109,48 @@ Plot $1$ (the blue line) shows the typical learning curve of stochastic gradient
 In practice, the learning rate $\alpha$ is typically held constant. However, if we want stochastic gradient descent to converge to a (local) minimum rather than wander of "oscillate" around it, we should slowly decrease $\alpha$ over time. For example,
 
 $$\alpha=\frac{\text{constant1}}{\text{iterationNumber}+\text{constant2}}$$
+
+## 16.4 Online Learning
+When the system needs to process stream data online, the algorithm can be:
+
+`repeat forever`
+{
+
+Get $(x,y)$ corresponding to user
+
+Update $\theta$ using $(x,y)$:
+
+$$\theta_j:=\theta_j-\alpha(h_{\theta}(x)-y)x_j$$ 
+
+(for every $j=0,\dots,n$)
+
+}
+
+This algorithm can adapt to changing user preference (i.e. if $p(y|x,\theta)$ changes over time). And it allows us to learn from a continuous stream of data, since we use each example once then no longer need to process it again. 
+
+## 16.5 Map-Reduce and Data Parallism
+Suppose we need to calculate batch gradient descent for $m=400$ dataset and we have the gradient descent formula:
+
+$$\theta_j:=\theta_j-\alpha\frac{1}{400}\sum_{i=1}^{400}(h_{\theta}(x^{(i)})-y^{(i)})x_j^{(i)}$$
+
+We can devide the summation step to $4$ machines, that is:
+
+- Machine 1: Use $(x^{(1)},y^{(1)}),\dots,(x^{(100)},y^{(100)})$.
+
+$$temp_j^{(1)}=\sum_{i=1}^{100}(h_{\theta}(x^{(i)})-y^{(i)})x_j^{(i)}$$
+
+- Machine 2: Use $(x^{(101)},y^{(101)}),\dots,(x^{(200)},y^{(200)})$.
+
+$$temp_j^{(2)}=\sum_{i=101}^{200}(h_{\theta}(x^{(i)})-y^{(i)})x_j^{(i)}$$
+
+- Machine 3: Use $(x^{(201)},y^{(201)}),\dots,(x^{(300)},y^{(300)})$.
+
+$$temp_j^{(3)}=\sum_{i=201}^{300}(h_{\theta}(x^{(i)})-y^{(i)})x_j^{(i)}$$
+
+- Machine 4: Use $(x^{(301)},y^{(301)}),\dots,(x^{(400)},y^{(400)})$.
+
+$$temp_j^{(4)}=\sum_{i=301}^{400}(h_{\theta}(x^{(i)})-y^{(i)})x_j^{(i)}$$
+
+Finally, we combine a result to the centralized server to calculate:
+
+$$\theta_j:=\theta_j-\alpha\frac{1}{400}(temp_j^{(1)}+temp_j^{(2)}+temp_j^{(3)}+temp_j^{(4)})$$
