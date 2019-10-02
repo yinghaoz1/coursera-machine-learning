@@ -2025,3 +2025,87 @@ $$
 We use this matrix to learn $\theta^{(j)}$ and $x^{(i)}$. And for user $j$ and movie $i$, we can predict the rating as
 
 $$(\theta^{(j)})^Tx^{(i)}+\mu_i$$
+
+# 16. Large Scale Machine Learning
+## 16.1 Stochastic Gradient Descent
+Recall the gradient descent that we learned before, which are also called **batch gradient descent**, the cost function and the gradient descent calculation looks like this:
+
+$$J_{train}(\theta)=\frac{1}{2m}\sum_{i=1}^m(h_{\theta}(x^{(i)})-y^{(i)})^2$$
+
+`repeat`
+{    
+$$\theta_j:=\theta_j-\alpha\frac{1}{m}\sum_{i=1}^m(h_{\theta}(x^{(i)})-y^{(i)})x^{(i)}_j$$
+
+(for every $j=0,\dots,n$)
+
+}
+
+Suppose we have a very large dataset, say $m=300,000,000$, for each iteration of $j$, we need to sum up all $300,000,000$ results, which is very inefficient way for computation.
+
+In contrast, here is another way of gradient descent called **stochastic gradient descent**, which is more computationally efficient. The cost function of stochastic gradient descent is a little bit different.
+
+$$cost(\theta,(x^{(i)},y^{(i)}))=\frac{1}{2}(h_{\theta}(x^{(i)})-y^{(i)})^2$$
+
+$$J_{train}(\theta)=\frac{1}{m}\sum_{i=1}^mcost(\theta,(x^{(i)},y^{(i)}))$$
+
+Different from the cost function of batch gradient descent, this cost function calculate and sum up the cost for each training example. The algorithm of stochastic gradient descent is like this.
+
+1. Randomly shuffle (reorder) training examples.
+2. `repeat`
+{
+
+for $i:=1,\dots,m$
+{
+$$\theta_j:=\theta_j-\alpha(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}$$
+
+(for every $j=0,\dots,n$)
+
+}
+
+}
+
+The line for batch gradient descent goes nearly straight to the global optimum. However, the line for stochastic gradient descent goes randomly or evern worse for each iteration, but very close to (not equaling to) the global optimum in the final iteration. This is not a problem in the industry.
+
+## 16.2 Mini-Batch Gradient Descent
+Let's compare three different types of gradient descent:
+
+- Batch gradient descent: Use all $m$ examples in each iteration
+- Stochastic gradient descent: Use $1$ example in each iteration
+- Mini-batch gradient descent: Use $b$ examples in each iteration
+
+In mini-batch gradient descent, $b$ is the batch size. Say $b=10,m=1000$, the algorithm will be:
+
+`repeat`
+{
+
+for $i=1,11,21,31,\dots,991$
+
+{
+
+$$\theta_j:=\theta_j-\alpha\frac{1}{10}\sum_{k=1}^{i+9}(h_{\theta}(x^{(k)})-y^{(k)})x_j^{(k)}$$
+
+(for every $j=0,\dots,n$)
+
+}
+}
+
+## 16.3 Stochastic Gradient Descent Convergence
+In batch gradient descent, one way we use to check for convergence is to plot $J_{train}(\theta)$ as a function of the number of iterations of gradient descent where
+
+$$J_{train}(\theta)=\frac{1}{2m}\sum_{i=1}^m(h_{\theta}(x^{(i)})-y^{(i)})^2$$
+
+In stochastic gradient descent, our cost function is:
+
+$$cost(\theta,(x^{(i)},y^{(i)}))=\frac{1}{2}(h_{\theta}(x^{(i)})-y^{(i)})^2$$
+
+During learning, we need to compute $cost(\theta,(x^{(i)},y^{(i)}))$ before updating $\theta$ using $(x^{(i)},y^{(i)})$. For every $1000$ iterations say, plot $cost(\theta,(x^{(i)},y^{(i)}))$ averaged over the last $1000$ examples processed by algorithm. 
+
+Here we have four typical plots of the learning curve for stochastic gradient descent. 
+
+![16-3-1](16-3-1.png)
+
+Plot $1$ (the blue line) shows the typical learning curve of stochastic gradient descent, with a little bit noisy but overall decreasing curve. When we use a smaller learning rate $\alpha$, the curve will decrease slowlier but closer to the global optimum. If you take a larger examples of $5000$ rather than $1000$, you will give a smoothier learning curve. Sometimes you can get a stable learning curve like plot $3$, but if you get a curve in plot $4$, you may try a smaller learning rate $\alpha$.
+
+In practice, the learning rate $\alpha$ is typically held constant. However, if we want stochastic gradient descent to converge to a (local) minimum rather than wander of "oscillate" around it, we should slowly decrease $\alpha$ over time. For example,
+
+$$\alpha=\frac{\text{constant1}}{\text{iterationNumber}+\text{constant2}}$$
